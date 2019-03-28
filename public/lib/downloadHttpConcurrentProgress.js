@@ -33,7 +33,7 @@
      * @param function callback function for test suite error event
      **/
     function downloadHttpConcurrentProgress(urls,  type, concurrentRuns, timeout, testLength, movingAverage, callbackComplete, callbackProgress, callbackAbort,
-                                            callbackTimeout, callbackError, size, progressIntervalDownload, monitorInterval) {
+                                            callbackTimeout, callbackError, size, progressIntervalDownload, monitorInterval, isHandheld) {
         this.urls = urls;
         this.size = size;
         this.type = type;
@@ -55,7 +55,7 @@
         this.clientCallbackTimeout = callbackTimeout;
         this.clientCallbackError = callbackError;
         //start time of test suite
-        this._beginTime = Date.now();
+        this._beginTime = timer();
         //boolean on whether test  suite is running or not
         this._running = true;
         //array holding  results
@@ -70,6 +70,8 @@
         this.resultsCount = 0;
         //results to send to client
         this.downloadResults = [];
+        // flag to track handheld devices
+        this.isHandheld = isHandheld;
     }
 
     /**
@@ -78,7 +80,7 @@
      */
     downloadHttpConcurrentProgress.prototype.onTestError = function (result) {
       if (this._running) {
-         if ((Date.now() - this._beginTime) > this.testLength) {
+         if ((timer() - this._beginTime) > this.testLength) {
            this.endTest();
           }
           else{
@@ -103,7 +105,11 @@
      */
     downloadHttpConcurrentProgress.prototype.onTestTimeout = function () {
         if(this._running) {
+<<<<<<< HEAD
             if ((Date.now() - this._beginTime) > this.testLength) {
+=======
+            if ((timer() - this._beginTime) > this.testLength) {
+>>>>>>> upstream/master
                 this.endTest();
             }
 
@@ -121,6 +127,11 @@
 
         //store results
         this._storeResults(result);
+        if (this.isHandheld) {
+            // setting concurrent runs to 1. As soon as one connection completes it start's another
+            // connection of the same size. This change is only for mobile devices.
+            this.concurrentRuns = 1;
+        }
         this.start();
         };
 
@@ -134,7 +145,11 @@
             return;
         }
         //check for end of test
+<<<<<<< HEAD
         if ((Date.now() - this._beginTime) > this.testLength) {
+=======
+        if ((timer() - this._beginTime) > this.testLength) {
+>>>>>>> upstream/master
             this.endTest();
         }
         this.totalBytes = this.totalBytes + result.loaded;
@@ -197,7 +212,7 @@
 
         if (this.results.length > 0) {
             for (var i = 0; i < this.results.length; i++) {
-                if (this.results[i].timeStamp > (Date.now() - this.monitorInterval)) {
+                if (this.results[i].timeStamp > (timer() - this.monitorInterval)) {
                     intervalBandwidth = intervalBandwidth + parseFloat(this.results[i].bandwidth);
                     totalLoaded = totalLoaded + this.results[i].chunckLoaded;
                     totalTime = totalTime + this.results[i].totalTime;
@@ -228,7 +243,11 @@
 
         }
         //check for end of test
+<<<<<<< HEAD
         if ((Date.now() - this._beginTime) > this.testLength) {
+=======
+        if ((timer() - this._beginTime) > this.testLength) {
+>>>>>>> upstream/master
           this.endTest();
         }
 
